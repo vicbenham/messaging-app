@@ -1,0 +1,23 @@
+Conception/Développement/Déploiement
+
+Agency
+
+IntroduceAgency => static web page for advertising
+
+socles:
+
+ReferentialAgency => clients, collaborators, contracts, ...
+ArchiveAgency => stock big data
+ConnectAgency => handle authentication 
+ControlAgency => control clients and collaborators activities
+TeamsAgency => handle communication between users
+marketplaceAgency => repertory app and handle access between then
+
+métiers:
+
+BaseAgency => base for all the module
+AgencyForMe => mobile application for clients
+EasyAgency => web application for collaborators
+FinAgency => application for finance
+...
+

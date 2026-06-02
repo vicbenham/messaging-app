@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class ChatService {
-
-    // MessageRepository messageRepository;
-
     public void send(Message message, UUID chatId){}
 
     public List<Message> getHistory(UUID chatId){

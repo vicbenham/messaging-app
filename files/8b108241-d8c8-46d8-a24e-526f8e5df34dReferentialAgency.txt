@@ -1,0 +1,24 @@
+# TP1 : ReferentialAgency - API de Gestion des Référentiels
+
+## Objectif
+
+Développer une API REST en Java permettant de gérer les référentiels essentiels d'une agence bancaire : clients, collaborateurs et contrats.
+
+## Spécifications techniques
+
+- **Backend** : API REST en Java (Spring Boot recommandé)
+- **Base de données** : PostgreSQL
+- **Fonctionnalités attendues** :
+  - CRUD complet pour les clients (nom, prénom, email, téléphone, date de naissance)
+  - CRUD complet pour les collaborateurs (nom, prénom, email, poste, date d'embauche)
+  - OPTIONNEL CRUD complet pour les contrats (numéro, type, date de début, date de fin, client associé)
+  - Endpoints de recherche et filtrage
+
+## Livrables
+
+1. Code source avec architecture en couches (Controller, Service, Repository)
+2. Script SQL de création de la base de données
+3. Documentation API (Swagger/OpenAPI)
+4. Instructions de déploiement
+
+**Critères d'évaluation** : qualité du code, respect des standards REST, gestion des erreurs, documentation.

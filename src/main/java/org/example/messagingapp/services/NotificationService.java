@@ -1,22 +1,15 @@
 package org.example.messagingapp.services;
 
 import lombok.Getter;
-import org.aspectj.weaver.ast.Not;
 import org.example.messagingapp.dtos.Notification;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
-@Getter
 public class NotificationService {
 
     private final Map<String, Sinks.Many<Notification>> sinkMap = new HashMap<>();
