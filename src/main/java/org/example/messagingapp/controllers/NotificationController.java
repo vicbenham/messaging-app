@@ -7,10 +7,8 @@ import org.example.messagingapp.enums.NotificationType;
 import org.example.messagingapp.services.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,17 +23,27 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Notification> test(){
-        return notificationService.getFlux();
+    public Flux<Notification> test(@RequestParam String user){
+        notificationService.addChannel(user);
+        return notificationService.useUserChannel(user);
     }
 
     @GetMapping("/fill")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void fill(){
+    public ResponseEntity fill(){
         Notification notification = new Notification(
                 "toto",
                 LocalDateTime.now(),
                 NotificationType.NEW_MESSAGE);
-        this.notificationService.addMessage(notification);
+        try {
+            this.notificationService.sendMessageToUser("toto", notification);
+            return ResponseEntity.ok("Message sent with success");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/unsubscribe")
+    public void unsubscribe(@RequestParam String userName){
+        this.notificationService.unsubscribe(userName);
     }
 }

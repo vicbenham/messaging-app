@@ -11,20 +11,33 @@ import reactor.core.publisher.Sinks;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Getter
 public class NotificationService {
 
-    private final Sinks.Many<Notification> sink = Sinks.many().multicast().onBackpressureBuffer();
+    private final Map<String, Sinks.Many<Notification>> sinkMap = new HashMap<>();
 
-    public void addMessage(Notification output){
-        sink.tryEmitNext(output);
+    public void addChannel(String userName){
+        sinkMap.putIfAbsent(userName, Sinks.many().multicast().onBackpressureBuffer());
     }
 
-    public Flux<Notification> getFlux(){
-        return sink.asFlux();
+    public void sendMessageToUser(String userName, Notification output) throws Exception {
+        if(sinkMap.get(userName) == null){
+            throw new Exception("No user");
+        }
+        sinkMap.get(userName).tryEmitNext(output);
+    }
+
+    public Flux<Notification> useUserChannel(String userName){
+        return sinkMap.get(userName).asFlux();
+    }
+
+    public void unsubscribe(String userName){
+        sinkMap.remove(userName);
     }
 
 }
