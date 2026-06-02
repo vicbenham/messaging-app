@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
-public class User {
+public class Contact {
     @Id
     private UUID id = UUID.randomUUID();
     private String username;
