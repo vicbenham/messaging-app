@@ -25,7 +25,7 @@ public class Message {
     private List<String> attachments;
     private LocalDateTime sentAt;
     @ManyToOne
-    private User sender;
+    private Contact sender;
     private Boolean isEdited = false;
     private UUID chatId;
     private MessageStatus status;

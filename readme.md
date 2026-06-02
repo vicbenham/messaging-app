@@ -17,7 +17,7 @@
     Ajout de la colonne pending dans la table jonctions et passe à pending si pas de soucis (existing, declined, not found)
 
 ## Story 3
-    Voir les relations en pending pour un user
+    Voir les relations en pending pour un contact
 
 ## Story 4
     SSE et si new_content = true et sended_at > 24h => send mail

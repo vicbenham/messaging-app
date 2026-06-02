@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.messagingapp.enums.ChatStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,8 +21,9 @@ public class Chat {
     @Id
     private UUID id = UUID.randomUUID();
     @OneToOne
-    private User sender;
+    private Contact sender;
     @OneToOne
-    private User receiver;
+    private Contact receiver;
     private final LocalDateTime createdAt = LocalDateTime.now();
+    private ChatStatus status;
 }
