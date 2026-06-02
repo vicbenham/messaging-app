@@ -1,0 +1,22 @@
+meta {
+  name: RequestFriend
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/contacts
+  body: json
+  auth: inherit
+}
+
+headers {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "tata@gmail.com",
+    "username": "tata"
+  }
+}

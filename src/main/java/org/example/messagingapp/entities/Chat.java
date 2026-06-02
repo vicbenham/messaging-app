@@ -1,6 +1,7 @@
 package org.example.messagingapp.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
+/*
+    CAREFUL => CUSTOM VALIDATION NEEDED TO
+    VALIDATED SENDER/RECEIVER
+ */
 public class Chat {
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    private Long id;
     @OneToOne
     private Contact sender;
     @OneToOne

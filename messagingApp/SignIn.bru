@@ -1,0 +1,23 @@
+meta {
+  name: SignIn
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/contacts/signin
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "toto@gmail.com",
+    "password": "123"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("token", res.body)
+  
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "messagingApp",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

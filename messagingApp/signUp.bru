@@ -1,0 +1,19 @@
+meta {
+  name: signUp
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/contacts/signup
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "tata",
+    "password": "123",
+    "email": "tata@gmail.com"
+  }
+}

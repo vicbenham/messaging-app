@@ -1,32 +1,77 @@
 package org.example.messagingapp.services;
 
-import org.example.messagingapp.dtos.ContactDto;
+import lombok.AllArgsConstructor;
+import org.example.messagingapp.dtos.FriendRequest;
+import org.example.messagingapp.dtos.Notification;
+import org.example.messagingapp.dtos.Signin;
+import org.example.messagingapp.dtos.Signup;
+import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
+import org.example.messagingapp.enums.ChatStatus;
+import org.example.messagingapp.enums.NotificationType;
+import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
+@AllArgsConstructor
 public class ContactService {
 
     private final ContactRepository contactRepository;
+    private final ChatRepository chatRepository;
+    private final NotificationService notificationService;
 
-    public ContactService(ContactRepository contactRepository) {
-        this.contactRepository = contactRepository;
-    }
-
-    public void create(ContactDto request) {
+    @Transactional
+    public void signup(Signup request) {
         Contact contact = Contact.builder()
-                .id(UUID.randomUUID())
-                .username(request.getUsername())
-                .password(request.getPassword())
-                .email(request.getEmail())
+                .username(request.username())
+                .password(request.password())
+                .email(request.email())
                 .build();
 
         contactRepository.save(contact);
     }
 
+    public Long signin(Signin request){
+        Optional<Contact> optionalContact = contactRepository.findContactByEmail(request.email());
+        Contact contact = optionalContact.orElseThrow(() -> new RuntimeException("Wrong credentials"));
+        if(!contact.getPassword().equals(request.password())){
+            throw new RuntimeException("Wrong credentials");
+        }
+
+        return contact.getId();
+    }
+
+    @Transactional
+    public void requestFriend(FriendRequest request, Long userId){
+        Optional<Contact> optionalSender = contactRepository.findById(userId);
+        Contact sender = optionalSender.orElseThrow(()-> new RuntimeException("Sender not found"));
+        Optional<Contact> optionalReceiver = contactRepository.findContactByEmail(request.email());
+        Contact receiver = optionalReceiver.orElseThrow(()-> new RuntimeException("Receiver not found"));
+
+        Chat chat = Chat.builder()
+                .status(ChatStatus.PENDING)
+                .sender(sender)
+                .receiver(receiver)
+                .build();
+
+
+        chatRepository.save(chat);
+        Notification notification = new Notification(
+                sender.getUsername() + " wants to be your friend",
+                LocalDateTime.now(),
+                NotificationType.PENDING_REQUEST);
+        try {
+            notificationService.sendMessageToUser(receiver.getUsername(), notification);
+        } catch (Exception e) {
+            throw new RuntimeException("Receiver not listening");
+        }
+    }
 }
 

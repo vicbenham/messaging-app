@@ -1,7 +1,7 @@
 package org.example.messagingapp.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.annotation.Generated;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +16,10 @@ import java.util.UUID;
 @Getter
 public class Contact {
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    private Long id;
     private String username;
     private String password;
+    @Column(unique = true)
     private String email;
 }
