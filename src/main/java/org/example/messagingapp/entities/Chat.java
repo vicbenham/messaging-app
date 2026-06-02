@@ -2,11 +2,13 @@ package org.example.messagingapp.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -14,10 +16,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
-public class User {
+public class Chat {
     @Id
     private UUID id = UUID.randomUUID();
-    private String username;
-    private String password;
-    private String email;
+    @OneToOne
+    private User sender;
+    @OneToOne
+    private User receiver;
+    private final LocalDateTime createdAt = LocalDateTime.now();
 }

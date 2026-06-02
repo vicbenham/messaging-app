@@ -1,6 +1,6 @@
 package org.example.messagingapp.enums;
 
-public enum MessageType {
+public enum MessageStatus {
     SENT,
     DELIVERED,
     READ
