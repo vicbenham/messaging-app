@@ -1,0 +1,57 @@
+package org.example.messagingapp.services;
+
+import lombok.AllArgsConstructor;
+import org.example.messagingapp.dtos.Notification;
+import org.example.messagingapp.dtos.SendMessage;
+import org.example.messagingapp.entities.Chat;
+import org.example.messagingapp.entities.Contact;
+import org.example.messagingapp.entities.Message;
+import org.example.messagingapp.enums.MessageStatus;
+import org.example.messagingapp.enums.NotificationType;
+import org.example.messagingapp.repositories.ChatRepository;
+import org.example.messagingapp.repositories.ContactRepository;
+import org.example.messagingapp.repositories.MessageRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Service
+@AllArgsConstructor
+@Transactional(readOnly = true)
+public class MessageService {
+
+    private final ContactRepository contactRepository;
+    private final ChatRepository chatRepository;
+    private final MessageRepository messageRepository;
+    private final NotificationService notificationService;
+
+    @Transactional
+    public void sendMessage(SendMessage request, Long userId) {
+        Optional<Contact> optionalSender = contactRepository.findById(userId);
+        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+
+        Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
+        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+
+         if (!chat.getSender().getId().equals(me.getId()) && !chat.getReceiver().getId().equals(me.getId())) {
+             throw new RuntimeException("User is not part of the chat");
+         }
+        Message message = Message.builder()
+                .content(request.content())
+                .sender(me)
+                .chatId(request.chatId())
+                .status(MessageStatus.SENT)
+                .sentAt(LocalDateTime.now())
+                .build();
+        messageRepository.save(message);
+        Contact receiver = me.equals(chat.getSender()) ? chat.getReceiver() : chat.getSender();
+        notificationService.sendMessageToUser(
+                receiver.getUsername(),
+                new Notification(
+                        receiver.getUsername() + " sent you message",
+                        LocalDateTime.now(),
+                        NotificationType.NEW_MESSAGE));
+    }
+}
