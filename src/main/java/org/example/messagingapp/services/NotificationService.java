@@ -20,7 +20,7 @@ public class NotificationService {
 
     public void sendMessageToUser(String userName, Notification output) {
         if(sinkMap.get(userName) == null){
-            System.out.println("No user found");
+            System.out.println("No user currently listening to this channel");
             return;
         }
         sinkMap.get(userName).tryEmitNext(output);

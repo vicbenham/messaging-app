@@ -1,0 +1,15 @@
+meta {
+  name: AcceptFriendRequest
+  type: http
+  seq: 5
+}
+
+patch {
+  url: http://localhost:8080/chats/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
