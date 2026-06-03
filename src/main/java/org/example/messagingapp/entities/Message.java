@@ -1,6 +1,7 @@
 package org.example.messagingapp.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -10,8 +11,6 @@ import lombok.NoArgsConstructor;
 import org.example.messagingapp.enums.MessageStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -20,13 +19,13 @@ import java.util.UUID;
 @Getter
 public class Message {
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    private Long id;
     private String content;
-    private List<String> attachments;
     private LocalDateTime sentAt;
     @ManyToOne
     private Contact sender;
     private Boolean isEdited = false;
-    private UUID chatId;
+    private Long chatId;
     private MessageStatus status;
 }
