@@ -2,6 +2,7 @@ package org.example.messagingapp.services;
 
 import lombok.AllArgsConstructor;
 import org.example.messagingapp.dtos.EditMessage;
+import org.example.messagingapp.dtos.MessageView;
 import org.example.messagingapp.dtos.Notification;
 import org.example.messagingapp.dtos.SendMessage;
 import org.example.messagingapp.entities.Chat;
@@ -9,6 +10,7 @@ import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.entities.Message;
 import org.example.messagingapp.enums.ChatStatus;
 import org.example.messagingapp.enums.MessageStatus;
+import org.example.messagingapp.enums.MessageType;
 import org.example.messagingapp.enums.NotificationType;
 import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
@@ -17,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,6 +56,7 @@ public class MessageService {
                 .chatId(request.chatId())
                 .status(MessageStatus.SENT)
                 .sentAt(LocalDateTime.now())
+                .type(MessageType.TEXT)
                 .build();
         messageRepository.save(message);
         Contact receiver = me.equals(chat.getSender()) ? chat.getReceiver() : chat.getSender();
@@ -128,5 +134,29 @@ public class MessageService {
                         NotificationType.MESSAGE_DELETED));
 
 
+    }
+
+    public List<MessageView> getConversation(Long chatId, Long userId){
+        Optional<Contact> optionalSender = contactRepository.findById(userId);
+        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Optional<Chat> optionalChat = chatRepository.findById(chatId);
+        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+
+        if(!me.equals(chat.getReceiver()) && !me.equals(chat.getSender())){
+            throw new RuntimeException("You cannot see this chat");
+        }
+        Collection<Message> messages = messageRepository.findAllByChatIdOrderBySentAt(chatId, Message.class);
+        List<MessageView> views = new ArrayList<>();
+        messages.stream().forEach((message -> {
+            MessageView view = new MessageView(
+                    message.getContent(),
+                    message.getSender().getUsername(),
+                    message.getSentAt(),
+                    message.getType(),
+                    message.getStatus()
+            );
+            views.add(view);
+        }));
+        return views;
     }
 }

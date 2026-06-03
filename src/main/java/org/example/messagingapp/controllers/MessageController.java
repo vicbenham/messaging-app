@@ -2,10 +2,13 @@ package org.example.messagingapp.controllers;
 
 import lombok.AllArgsConstructor;
 import org.example.messagingapp.dtos.EditMessage;
+import org.example.messagingapp.dtos.MessageView;
 import org.example.messagingapp.dtos.SendMessage;
 import org.example.messagingapp.services.MessageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/messages")
@@ -13,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class MessageController {
 
     private final MessageService messageService;
+
+    @GetMapping("/{chatId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<MessageView> getConversation(@PathVariable Long chatId, @RequestHeader("token") Long userId){
+        return messageService.getConversation(chatId, userId);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

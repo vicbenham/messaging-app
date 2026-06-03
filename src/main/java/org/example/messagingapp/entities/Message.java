@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.example.messagingapp.enums.MessageStatus;
+import org.example.messagingapp.enums.MessageType;
 
 import java.time.LocalDateTime;
 
@@ -26,5 +27,6 @@ public class Message {
     @Setter
     private Boolean isEdited = false;
     private Long chatId;
+    private MessageType type;
     private MessageStatus status;
 }
