@@ -1,6 +1,5 @@
 package org.example.messagingapp.services;
 
-import lombok.Getter;
 import org.example.messagingapp.dtos.Notification;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

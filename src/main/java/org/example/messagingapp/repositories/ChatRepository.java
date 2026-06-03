@@ -1,6 +1,5 @@
 package org.example.messagingapp.repositories;
 
-import org.example.messagingapp.dtos.ChatView;
 import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -5,7 +5,6 @@ import lombok.*;
 import org.example.messagingapp.enums.ChatStatus;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @AllArgsConstructor

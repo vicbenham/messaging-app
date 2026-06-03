@@ -1,6 +1,5 @@
 package org.example.messagingapp.controllers;
 
-import org.example.messagingapp.dtos.FriendRequest;
 import org.example.messagingapp.dtos.Signin;
 import org.example.messagingapp.dtos.Signup;
 import org.example.messagingapp.services.ContactService;
