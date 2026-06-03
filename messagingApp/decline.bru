@@ -1,0 +1,15 @@
+meta {
+  name: decline
+  type: http
+  seq: 8
+}
+
+delete {
+  url: http://localhost:8080/chats/2
+  body: none
+  auth: inherit
+}
+
+headers {
+  token: {{token}}
+}

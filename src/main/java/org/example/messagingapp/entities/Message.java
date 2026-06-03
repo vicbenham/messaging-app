@@ -4,10 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.messagingapp.enums.MessageStatus;
 
 import java.time.LocalDateTime;
@@ -21,10 +18,12 @@ public class Message {
     @Id
     @GeneratedValue
     private Long id;
+    @Setter
     private String content;
     private LocalDateTime sentAt;
     @ManyToOne
     private Contact sender;
+    @Setter
     private Boolean isEdited = false;
     private Long chatId;
     private MessageStatus status;

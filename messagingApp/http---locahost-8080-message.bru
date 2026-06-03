@@ -1,0 +1,22 @@
+meta {
+  name: http://locahost:8080/message
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:8080/messages
+  body: json
+  auth: inherit
+}
+
+headers {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "content": "toto message",
+    "chatId": 2
+  }
+}
