@@ -67,11 +67,7 @@ public class ContactService {
                 sender.getUsername() + " wants to be your friend",
                 LocalDateTime.now(),
                 NotificationType.PENDING_REQUEST);
-        try {
-            notificationService.sendMessageToUser(receiver.getUsername(), notification);
-        } catch (Exception e) {
-            throw new RuntimeException("Receiver not listening");
-        }
+        notificationService.sendMessageToUser(receiver.getUsername(), notification);
     }
 }
 

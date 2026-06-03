@@ -9,10 +9,7 @@ import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -34,7 +31,7 @@ public class ChatService {
     public List<ChatView> listAllForOneUser(Long userId){
         Optional<Contact> optionalContact = contactRepository.findById(userId);
         Contact contact = optionalContact.orElseThrow(() -> new RuntimeException("Contact not found"));
-        List<Chat> chats = chatRepository.findAllBySenderOrReceiver(contact, contact);
+        Collection<Chat> chats = chatRepository.findAllBySenderOrReceiver(contact, contact, Chat.class);
         List<ChatView> results = new ArrayList<>();
         chats.stream().forEach(chat -> {
             Contact receiver = chat.getSender().equals(contact.getUsername()) ? chat.getReceiver() : chat.getSender();

@@ -18,9 +18,10 @@ public class NotificationService {
         sinkMap.putIfAbsent(userName, Sinks.many().multicast().onBackpressureBuffer());
     }
 
-    public void sendMessageToUser(String userName, Notification output) throws Exception {
+    public void sendMessageToUser(String userName, Notification output) {
         if(sinkMap.get(userName) == null){
-            throw new Exception("No user");
+            System.out.println("No user found");
+            return;
         }
         sinkMap.get(userName).tryEmitNext(output);
     }
