@@ -10,9 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatExistValidator implements ConstraintValidator<ChatExist, Long> {
 
-    @Autowired
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
+    ChatExistValidator(ChatRepository chatRepository){
+        this.chatRepository = chatRepository;
+    }
     @Override
     public boolean isValid(Long chatId, ConstraintValidatorContext constraintValidatorContext) {
         return chatRepository.existsById(chatId);
