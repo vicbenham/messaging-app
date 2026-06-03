@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="0001-insert-contacts" author="copilot">
+        <comment>Insert three default contacts: Toto, Tata, Titi</comment>
+
+        <insert tableName="contact">
+            <column name="id" value="1"/>
+            <column name="username" value="toto"/>
+            <column name="password" value="123"/>
+            <column name="email" value="toto@gmail.com"/>
+        </insert>
+
+        <insert tableName="contact">
+            <column name="id" value="2"/>
+            <column name="username" value="tata"/>
+            <column name="password" value="123"/>
+            <column name="email" value="tata@gmail.com"/>
+        </insert>
+
+        <insert tableName="contact">
+            <column name="id" value="3"/>
+            <column name="username" value="titi"/>
+            <column name="password" value="123"/>
+            <column name="email" value="titi@gmail.com"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>
+

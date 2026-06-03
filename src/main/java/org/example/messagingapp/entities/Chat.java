@@ -1,13 +1,7 @@
 package org.example.messagingapp.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.example.messagingapp.enums.ChatStatus;
 
 import java.time.LocalDateTime;
@@ -18,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"sender_id", "receiver_id"}))
 /*
     CAREFUL => CUSTOM VALIDATION NEEDED TO
     VALIDATED SENDER/RECEIVER
@@ -26,10 +21,11 @@ public class Chat {
     @Id
     @GeneratedValue
     private Long id;
-    @OneToOne
+    @ManyToOne
     private Contact sender;
-    @OneToOne
+    @ManyToOne
     private Contact receiver;
     private final LocalDateTime createdAt = LocalDateTime.now();
+    @Setter
     private ChatStatus status;
 }
