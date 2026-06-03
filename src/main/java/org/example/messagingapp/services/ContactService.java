@@ -56,7 +56,7 @@ public class ContactService {
         Contact receiver = optionalReceiver.orElseThrow(()-> new RuntimeException("Receiver not found"));
 
         Chat chat = Chat.builder()
-                .status(ChatStatus.PENDING)
+                .status(sender.getId().equals(receiver.getId()) ? ChatStatus.ACCEPTED : ChatStatus.PENDING)
                 .sender(sender)
                 .receiver(receiver)
                 .build();
