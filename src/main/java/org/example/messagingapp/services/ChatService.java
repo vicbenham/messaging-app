@@ -2,6 +2,7 @@ package org.example.messagingapp.services;
 
 import lombok.AllArgsConstructor;
 import org.example.messagingapp.dtos.ChatView;
+import org.example.messagingapp.dtos.FriendRequest;
 import org.example.messagingapp.dtos.Notification;
 import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
@@ -63,6 +64,28 @@ public class ChatService {
             results.add(chatViewEl);
         });
         return results;
+    }
+
+    @Transactional
+    public void requestFriend(FriendRequest request, Long userId){
+        Optional<Contact> optionalSender = contactRepository.findById(userId);
+        Contact sender = optionalSender.orElseThrow(()-> new RuntimeException("Sender not found"));
+        Optional<Contact> optionalReceiver = contactRepository.findContactByEmail(request.email());
+        Contact receiver = optionalReceiver.orElseThrow(()-> new RuntimeException("Receiver not found"));
+
+        Chat chat = Chat.builder()
+                .status(sender.getId().equals(receiver.getId()) ? ChatStatus.ACCEPTED : ChatStatus.PENDING)
+                .sender(sender)
+                .receiver(receiver)
+                .build();
+
+
+        chatRepository.save(chat);
+        Notification notification = new Notification(
+                sender.getUsername() + " wants to be your friend",
+                LocalDateTime.now(),
+                NotificationType.PENDING_REQUEST);
+        notificationService.sendMessageToUser(receiver.getUsername(), notification);
     }
 
     @Transactional

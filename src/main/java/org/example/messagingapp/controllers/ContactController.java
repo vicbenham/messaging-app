@@ -29,10 +29,5 @@ public class ContactController {
         return contactService.signin(request);
     }
 
-    @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    public void requestFriend(@RequestBody FriendRequest request, @RequestHeader("token") Long userId){
-        contactService.requestFriend(request, userId);
-    }
 }
 
