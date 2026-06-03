@@ -6,6 +6,7 @@ import org.example.messagingapp.dtos.SendMessage;
 import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.entities.Message;
+import org.example.messagingapp.enums.ChatStatus;
 import org.example.messagingapp.enums.MessageStatus;
 import org.example.messagingapp.enums.NotificationType;
 import org.example.messagingapp.repositories.ChatRepository;
@@ -38,6 +39,11 @@ public class MessageService {
          if (!chat.getSender().getId().equals(me.getId()) && !chat.getReceiver().getId().equals(me.getId())) {
              throw new RuntimeException("User is not part of the chat");
          }
+
+         if(!chat.getStatus().equals(ChatStatus.ACCEPTED)) {
+            throw new RuntimeException("Chat status is not ACCEPTED");
+        }
+
         Message message = Message.builder()
                 .content(request.content())
                 .sender(me)

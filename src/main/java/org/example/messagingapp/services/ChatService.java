@@ -28,18 +28,6 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final NotificationService notificationService;
 
-    public void send(Message message, UUID chatId){}
-
-    public List<Message> getHistory(UUID chatId){
-        return null;
-    }
-
-    public Chat findOrCreateChat(Contact sender, Contact receiver){
-        return null;
-    }
-
-
-
     public List<ChatView> listAllForOneUser(Long userId){
 
         Optional<Contact> optionalContact = contactRepository.findById(userId);
