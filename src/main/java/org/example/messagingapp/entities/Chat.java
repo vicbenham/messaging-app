@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.messagingapp.enums.ChatStatus;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -27,4 +28,14 @@ public class Chat {
     private final LocalDateTime createdAt = LocalDateTime.now();
     @Setter
     private ChatStatus status;
+
+    @Setter
+    private Boolean isGroup = false;
+    @Setter
+    private String groupName;
+    @Setter
+    @ManyToMany
+    @JoinTable(name = "chat_participants", joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "contact_id"))
+    private Set<Contact> participants;
 }
