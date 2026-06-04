@@ -38,6 +38,8 @@ public class FileService {
     private ContactRepository contactRepository;
     @Autowired
     private MessageRepository messageRepository;
+    @Autowired
+    private AuditLogService auditLogService;
 
     @Transactional
     public void uploadFile(SendFile input, Long userId){
@@ -65,7 +67,9 @@ public class FileService {
                 .sender(me)
                 .build();
         messageRepository.save(message);
+        auditLogService.logMessage(message);
     }
+
     private String store(MultipartFile file,
                        String fileName) {
         Path uploadedPath = Paths.get(uploadDir);

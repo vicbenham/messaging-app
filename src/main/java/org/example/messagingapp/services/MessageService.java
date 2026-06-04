@@ -33,6 +33,7 @@ public class MessageService {
     private final FriendshipRepository friendshipRepository;
     private final MessageRepository messageRepository;
     private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public void sendMessage(SendMessage request, Long userId) {
@@ -59,6 +60,7 @@ public class MessageService {
                 .type(MessageType.TEXT)
                 .build();
         messageRepository.save(message);
+        auditLogService.logMessage(message);
 
         Contact receiver = me.equals(friendship.getUser1()) ? friendship.getUser2() : friendship.getUser1();
         notificationService.sendMessageToUser(

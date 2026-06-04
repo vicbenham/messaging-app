@@ -1,9 +1,13 @@
 package org.example.messagingapp.services;
 
+import org.example.messagingapp.dtos.AuditLogView;
 import org.example.messagingapp.entities.AuditLog;
-import org.example.messagingapp.enums.AuditActionType;
+import org.example.messagingapp.entities.Message;
 import org.example.messagingapp.repositories.AuditLogRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AuditLogService {
@@ -14,35 +18,38 @@ public class AuditLogService {
         this.auditLogRepository = auditLogRepository;
     }
 
-    public void logMessage(
-            String sender,
-            String receiver,
-            String content
-    ) {
+    public void logMessage(Message message) {
 
-        AuditLog log = new AuditLog(
-                AuditActionType.MESSAGE,
-                sender,
-                receiver,
-                content
-        );
+        AuditLog log = AuditLog.builder()
+                .content(message.getContent())
+                .sentAt(message.getSentAt())
+                .sender(message.getSender())
+                .type(message.getType())
+                .chatId(message.getChatId())
+                .isEdited(message.getIsEdited())
+                .status(message.getStatus())
+                .build();
 
         auditLogRepository.save(log);
     }
 
-    public void logFile(
-            String sender,
-            String receiver,
-            String fileName
-    ) {
+    public List<AuditLogView> listAllLogs() {
+        List<AuditLog> auditLogs = auditLogRepository.findAll();
+        List<AuditLogView> result = new ArrayList<>();
 
-        AuditLog log = new AuditLog(
-                AuditActionType.FILE,
-                sender,
-                receiver,
-                fileName
-        );
-
-        auditLogRepository.save(log);
+        auditLogs.forEach(log -> {
+            AuditLogView toSave = new AuditLogView(
+                    log.getId(),
+                    log.getContent(),
+                    log.getSentAt(),
+                    log.getSender().getEmail(),
+                    log.getIsEdited(),
+                    log.getChatId(),
+                    log.getType(),
+                    log.getStatus()
+            );
+            result.add(toSave);
+        });
+        return result;
     }
 }
