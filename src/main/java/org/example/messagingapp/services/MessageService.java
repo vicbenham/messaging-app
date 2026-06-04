@@ -112,27 +112,46 @@ public class MessageService {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
         Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
 
-        Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
-        Friendship friendship = optionalFriendship.orElseThrow(() -> new RuntimeException("Friendship not found"));
+        Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
+        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
 
-        if (!friendship.getUser1().getId().equals(me.getId()) && !friendship.getUser2().getId().equals(me.getId())) {
-            throw new RuntimeException("User is not part of this friendship");
+        if (!chat.getIsGroup()) {
+            Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
+            Friendship friendship = optionalFriendship.orElseThrow(() -> new RuntimeException("Friendship not found"));
+
+            if (!friendship.getUser1().getId().equals(me.getId()) && !friendship.getUser2().getId().equals(me.getId())) {
+                throw new RuntimeException("User is not part of this friendship");
+            }
+
+            if (!friendship.getStatus().equals(ChatStatus.ACCEPTED)) {
+                throw new RuntimeException("Friendship status is not ACCEPTED");
+            }
+
+            Optional<Message> optionalMessage = messageRepository.findById(request.messageId());
+            Message message = optionalMessage.orElseThrow(() -> new RuntimeException("Message not found"));
+
+            if (!message.getSender().equals(me)) {
+                throw new RuntimeException("You cannot edit a message you didn't write");
+            }
+
+            message.setIsEdited(true);
+            message.setContent(request.content());
+
+            messageRepository.save(message);
+            auditLogService.logMessage(message);
+
+            Contact receiver = me.equals(friendship.getUser1()) ? friendship.getUser2() : friendship.getUser1();
+            notificationService.sendMessageToUser(
+                    receiver.getUsername(),
+                    new Notification(
+                            me.getUsername() + " edited a message",
+                            LocalDateTime.now(),
+                            NotificationType.MESSAGE_UPDATED));
+            return;
         }
 
-        if (!friendship.getStatus().equals(ChatStatus.ACCEPTED)) {
-            throw new RuntimeException("Friendship status is not ACCEPTED");
-        } else {
-
-            Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
-            Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
-
-            if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
-                throw new RuntimeException("User is not part of this chat");
-            }
-
-            if (!chat.getStatus().equals(ChatStatus.ACCEPTED)) {
-                throw new RuntimeException("Chat status is not ACCEPTED");
-            }
+        if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
+            throw new RuntimeException("Contact is not part of this chat");
         }
 
         Optional<Message> optionalMessage = messageRepository.findById(request.messageId());
@@ -146,14 +165,15 @@ public class MessageService {
         message.setContent(request.content());
 
         messageRepository.save(message);
-
-        Contact receiver = me.equals(friendship.getUser1()) ? friendship.getUser2() : friendship.getUser1();
-        notificationService.sendMessageToUser(
-                receiver.getUsername(),
-                new Notification(
-                        me.getUsername() + " edited a message",
-                        LocalDateTime.now(),
-                        NotificationType.MESSAGE_UPDATED));
+        auditLogService.logMessage(message);
+        chat.getParticipants().stream()
+                .filter(p -> !p.getId().equals(me.getId()))
+                .forEach(p -> notificationService.sendMessageToUser(
+                        p.getUsername(),
+                        new Notification(
+                                me.getUsername() + " edited a message in " + chat.getGroupName(),
+                                LocalDateTime.now(),
+                                NotificationType.MESSAGE_UPDATED)));
     }
 
     @Transactional
@@ -171,7 +191,10 @@ public class MessageService {
                 throw new RuntimeException("You cannot delete message you didn't send");
             }
 
+            message.setStatus(MessageStatus.DELETED);
+            auditLogService.logMessage(message);
             messageRepository.delete(message);
+
             Contact receiver = me.equals(friendship.getUser1()) ? friendship.getUser2() : friendship.getUser1();
             notificationService.sendMessageToUser(
                     receiver.getUsername(),
@@ -187,7 +210,11 @@ public class MessageService {
         if (!me.equals(message.getSender())) {
             throw new RuntimeException("You cannot delete message you didn't send");
         }
+
+        message.setStatus(MessageStatus.DELETED);
+        auditLogService.logMessage(message);
         messageRepository.delete(message);
+
         chat.getParticipants().stream()
                 .filter(p -> !p.getId().equals(me.getId()))
                 .forEach(p -> notificationService.sendMessageToUser(

@@ -5,9 +5,21 @@ meta {
 }
 
 patch {
-  url: http://localhost:8080/message
-  body: none
+  url: http://localhost:8080/messages
+  body: json
   auth: inherit
+}
+
+headers {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "content": "edited toto group message",
+    "messageId": 1,
+    "chatId": 1
+  }
 }
 
 settings {

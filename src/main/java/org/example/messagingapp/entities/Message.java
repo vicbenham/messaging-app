@@ -28,5 +28,6 @@ public class Message {
     private Boolean isEdited = false;
     private Long chatId;
     private MessageType type;
+    @Setter
     private MessageStatus status;
 }
