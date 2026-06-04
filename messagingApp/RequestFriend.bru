@@ -1,11 +1,11 @@
 meta {
-  name: RequestFriend
+  name: requestFriend
   type: http
   seq: 4
 }
 
 post {
-  url: http://localhost:8080/chats
+  url: http://localhost:8080/friendships
   body: json
   auth: inherit
 }
@@ -16,7 +16,7 @@ headers {
 
 body:json {
   {
-    "email": "tata@gmail.com",
-    "username": "tata"
+    "email": "toto@gmail.com",
+    "username": "toto"
   }
 }

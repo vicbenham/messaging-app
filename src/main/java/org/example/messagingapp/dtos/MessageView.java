@@ -6,6 +6,7 @@ import org.example.messagingapp.enums.MessageType;
 import java.time.LocalDateTime;
 
 public record MessageView(
+        Long messageId,
         String content,
         String senderName,
         LocalDateTime sendAt,
