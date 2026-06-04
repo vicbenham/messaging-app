@@ -6,12 +6,16 @@ import org.example.messagingapp.dtos.CreateGroupChat;
 import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.enums.ChatStatus;
+import org.example.messagingapp.exceptions.NotFoundException;
 import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -28,7 +32,7 @@ public class ChatService {
 
         // group chats
         Optional<Contact> optionalContact = contactRepository.findById(userId);
-        Contact me = optionalContact.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Contact me = optionalContact.orElseThrow(() -> new NotFoundException("Contact not found"));
 
         List<Chat> groupChats = chatRepository.findAllByParticipantsContains(me);
         groupChats.forEach(chat -> {
@@ -51,7 +55,7 @@ public class ChatService {
     public void createGroupChat(CreateGroupChat request, Long adminId) {
 
         Optional<Contact> optionalAdmin = contactRepository.findById(adminId);
-        Contact admin = optionalAdmin.orElseThrow(() -> new RuntimeException("Admin not found"));
+        Contact admin = optionalAdmin.orElseThrow(() -> new NotFoundException("Admin not found"));
 
         Chat chat = Chat.builder()
                 .isGroup(true)
