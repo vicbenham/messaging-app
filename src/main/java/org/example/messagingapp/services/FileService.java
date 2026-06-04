@@ -1,6 +1,5 @@
 package org.example.messagingapp.services;
 
-import lombok.AllArgsConstructor;
 import org.example.messagingapp.dtos.SendFile;
 import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
