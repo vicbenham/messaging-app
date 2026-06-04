@@ -5,14 +5,17 @@ import org.example.messagingapp.dtos.EditMessage;
 import org.example.messagingapp.dtos.MessageView;
 import org.example.messagingapp.dtos.Notification;
 import org.example.messagingapp.dtos.SendMessage;
+import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.entities.Friendship;
-import org.example.messagingapp.entities.Chat;
 import org.example.messagingapp.entities.Message;
 import org.example.messagingapp.enums.ChatStatus;
 import org.example.messagingapp.enums.MessageStatus;
 import org.example.messagingapp.enums.MessageType;
 import org.example.messagingapp.enums.NotificationType;
+import org.example.messagingapp.exceptions.ConflictException;
+import org.example.messagingapp.exceptions.ForbiddenException;
+import org.example.messagingapp.exceptions.NotFoundException;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.example.messagingapp.repositories.FriendshipRepository;
 import org.example.messagingapp.repositories.MessageRepository;
@@ -40,18 +43,18 @@ public class MessageService {
     @Transactional
     public void sendMessage(SendMessage request, Long userId) {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
-        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Contact me = optionalSender.orElseThrow(() -> new NotFoundException("Contact not found"));
 
         Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
         if (optionalFriendship.isPresent()) {
             Friendship friendship = optionalFriendship.get();
 
             if (!friendship.getUser1().getId().equals(me.getId()) && !friendship.getUser2().getId().equals(me.getId())) {
-                throw new RuntimeException("Contact is not part of this friendship");
+                throw new ConflictException("Contact is not part of this friendship");
             }
 
             if (!friendship.getStatus().equals(ChatStatus.ACCEPTED)) {
-                throw new RuntimeException("Friendship status is not ACCEPTED");
+                throw new ConflictException("Friendship status is not ACCEPTED");
             }
 
             Message message = Message.builder()
@@ -76,14 +79,14 @@ public class MessageService {
         }
 
         Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
-        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+        Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
 
         if (chat.getIsGroup() == null || !chat.getIsGroup()) {
-            throw new RuntimeException("Chat is not a group and no friendship found");
+            throw new ConflictException("Chat is not a group and no friendship found");
         }
 
         if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
-            throw new RuntimeException("Contact is not part of this chat");
+            throw new ConflictException("Contact is not part of this chat");
         }
 
         Message message = Message.builder()
@@ -110,28 +113,28 @@ public class MessageService {
     @Transactional
     public void editMessage(EditMessage request, Long userId) {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
-        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Contact me = optionalSender.orElseThrow(() -> new NotFoundException("Contact not found"));
 
         Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
-        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+        Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
 
         if (!chat.getIsGroup()) {
             Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
-            Friendship friendship = optionalFriendship.orElseThrow(() -> new RuntimeException("Friendship not found"));
+            Friendship friendship = optionalFriendship.orElseThrow(() -> new NotFoundException("Friendship not found"));
 
             if (!friendship.getUser1().getId().equals(me.getId()) && !friendship.getUser2().getId().equals(me.getId())) {
-                throw new RuntimeException("User is not part of this friendship");
+                throw new ConflictException("User is not part of this friendship");
             }
 
             if (!friendship.getStatus().equals(ChatStatus.ACCEPTED)) {
-                throw new RuntimeException("Friendship status is not ACCEPTED");
+                throw new ConflictException("Friendship status is not ACCEPTED");
             }
 
             Optional<Message> optionalMessage = messageRepository.findById(request.messageId());
-            Message message = optionalMessage.orElseThrow(() -> new RuntimeException("Message not found"));
+            Message message = optionalMessage.orElseThrow(() -> new NotFoundException("Message not found"));
 
             if (!message.getSender().equals(me)) {
-                throw new RuntimeException("You cannot edit a message you didn't write");
+                throw new ForbiddenException("You cannot edit a message you didn't write");
             }
 
             message.setIsEdited(true);
@@ -151,14 +154,14 @@ public class MessageService {
         }
 
         if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
-            throw new RuntimeException("Contact is not part of this chat");
+            throw new ConflictException("Contact is not part of this chat");
         }
 
         Optional<Message> optionalMessage = messageRepository.findById(request.messageId());
-        Message message = optionalMessage.orElseThrow(() -> new RuntimeException("Message not found"));
+        Message message = optionalMessage.orElseThrow(() -> new NotFoundException("Message not found"));
 
         if (!message.getSender().equals(me)) {
-            throw new RuntimeException("You cannot edit a message you didn't write");
+            throw new ForbiddenException("You cannot edit a message you didn't write");
         }
 
         message.setIsEdited(true);
@@ -179,16 +182,16 @@ public class MessageService {
     @Transactional
     public void deleteMessage(Long messageId, Long userId) {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
-        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Contact me = optionalSender.orElseThrow(() -> new NotFoundException("Contact not found"));
 
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
-        Message message = optionalMessage.orElseThrow(() -> new RuntimeException("Message not found"));
+        Message message = optionalMessage.orElseThrow(() -> new NotFoundException("Message not found"));
 
         Optional<Friendship> optionalFriendship = friendshipRepository.findById(message.getChatId());
         if (optionalFriendship.isPresent()) {
             Friendship friendship = optionalFriendship.get();
             if (!me.equals(message.getSender())) {
-                throw new RuntimeException("You cannot delete message you didn't send");
+                throw new ForbiddenException("You cannot delete message you didn't send");
             }
 
             message.setStatus(MessageStatus.DELETED);
@@ -206,9 +209,9 @@ public class MessageService {
         }
 
         Optional<Chat> optionalChat = chatRepository.findById(message.getChatId());
-        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+        Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
         if (!me.equals(message.getSender())) {
-            throw new RuntimeException("You cannot delete message you didn't send");
+            throw new ForbiddenException("You cannot delete message you didn't send");
         }
 
         message.setStatus(MessageStatus.DELETED);
@@ -227,19 +230,19 @@ public class MessageService {
 
     public List<MessageView> getConversation(Long chatId, Long userId) {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
-        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+        Contact me = optionalSender.orElseThrow(() -> new NotFoundException("Contact not found"));
 
         Optional<Friendship> optionalFriendship = friendshipRepository.findById(chatId);
         if (optionalFriendship.isPresent()) {
             Friendship friendship = optionalFriendship.get();
             if (!me.equals(friendship.getUser1()) && !me.equals(friendship.getUser2())) {
-                throw new RuntimeException("You cannot see this friendship");
+                throw new ForbiddenException("You cannot see this friendship");
             }
         } else {
             Optional<Chat> optionalChat = chatRepository.findById(chatId);
-            Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
+            Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
             if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
-                throw new RuntimeException("You cannot see this chat");
+                throw new ForbiddenException("You cannot see this chat");
             }
         }
 

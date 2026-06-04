@@ -8,6 +8,9 @@ import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.entities.Friendship;
 import org.example.messagingapp.enums.ChatStatus;
 import org.example.messagingapp.enums.NotificationType;
+import org.example.messagingapp.exceptions.ConflictException;
+import org.example.messagingapp.exceptions.ForbiddenException;
+import org.example.messagingapp.exceptions.NotFoundException;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.example.messagingapp.repositories.FriendshipRepository;
 import org.springframework.stereotype.Service;
@@ -20,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
-//ajout
-import org.example.messagingapp.exceptions.*;
 
 @Service
 @AllArgsConstructor

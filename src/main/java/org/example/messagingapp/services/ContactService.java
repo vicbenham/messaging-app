@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import org.example.messagingapp.dtos.Signin;
 import org.example.messagingapp.dtos.Signup;
 import org.example.messagingapp.entities.Contact;
+import org.example.messagingapp.exceptions.ForbiddenException;
 import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
-import org.example.messagingapp.exceptions.ForbiddenException;
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
