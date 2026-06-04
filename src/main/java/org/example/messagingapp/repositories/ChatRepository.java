@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
-    List<Chat> findAllBySenderOrReceiver(Contact sender, Contact receiver);
-    <T> Collection<T> findAllBySenderOrReceiver(Contact sender, Contact receiver, Class<T> Type);
+    List<Chat> findAllByParticipantsContains(Contact participant);
 }
