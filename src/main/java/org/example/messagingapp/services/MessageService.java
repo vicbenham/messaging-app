@@ -104,7 +104,7 @@ public class MessageService {
         notificationService.sendMessageToUser(
                 receiver.getUsername(),
                 new Notification(
-                        me.getUsername() + " modifies a message",
+                        me.getUsername() + " edited a message",
                         LocalDateTime.now(),
                         NotificationType.MESSAGE_UPDATED));
     }
@@ -149,6 +149,7 @@ public class MessageService {
         List<MessageView> views = new ArrayList<>();
         messages.forEach((message -> {
             MessageView view = new MessageView(
+                    message.getId(),
                     message.getContent(),
                     message.getSender().getUsername(),
                     message.getSentAt(),

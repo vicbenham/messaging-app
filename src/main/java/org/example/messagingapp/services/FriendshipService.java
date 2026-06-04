@@ -45,8 +45,8 @@ public class FriendshipService {
 
             ChatView chatViewEl = new ChatView(
                     friendship.getId(),
-                    contact.getEmail(),
                     contact.getUsername(),
+                    contact.getEmail(),
                     friendship.getStatus(),
                     friendship.getCreatedAt(),
                     true);
