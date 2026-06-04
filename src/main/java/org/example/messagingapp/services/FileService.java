@@ -6,6 +6,9 @@ import org.example.messagingapp.entities.Contact;
 import org.example.messagingapp.entities.Message;
 import org.example.messagingapp.enums.MessageStatus;
 import org.example.messagingapp.enums.MessageType;
+import org.example.messagingapp.exceptions.ConflictException;
+import org.example.messagingapp.exceptions.ForbiddenException;
+import org.example.messagingapp.exceptions.NotFoundException;
 import org.example.messagingapp.repositories.ChatRepository;
 import org.example.messagingapp.repositories.ContactRepository;
 import org.example.messagingapp.repositories.MessageRepository;
@@ -34,29 +37,48 @@ public class FileService {
 
     @Autowired
     private ChatRepository chatRepository;
+
     @Autowired
     private ContactRepository contactRepository;
+
     @Autowired
     private MessageRepository messageRepository;
+
     @Autowired
     private AuditLogService auditLogService;
 
     @Transactional
-    public void uploadFile(SendFile input, Long userId){
-        Optional<Contact> optionalSender = contactRepository.findById(userId);
-        Contact me = optionalSender.orElseThrow(() -> new RuntimeException("Contact not found"));
+    public void uploadFile(SendFile input, Long userId) {
 
-        Optional<Chat> optionalChat = chatRepository.findById(input.chatId());
-        Chat chat = optionalChat.orElseThrow(() -> new RuntimeException("Chat not found"));
-        String content = "";
-        //upload, create and save message, notify and logs
-        if ((input.file() != null)) {
-            MultipartFile file = input.file();
-            String baseName = UUID.randomUUID().toString();
-            String fileName = baseName
-                    + file.getOriginalFilename();
-            content = store(file, fileName);
+        Contact me = contactRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Contact not found"));
+
+        Chat chat = chatRepository.findById(input.chatId())
+                .orElseThrow(() -> new NotFoundException("Chat not found"));
+        if (!chat.getSender().equals(me) && !chat.getReceiver().equals(me)) {
+            throw new ForbiddenException("You are not part of this chat");
         }
+
+        if (input.file() == null) {
+            throw new ConflictException("No file provided");
+        }
+
+        /*
+         * Vérification que l'utilisateur appartient au chat.
+         * Garde ce bloc uniquement si Chat possède bien sender et receiver.
+         */
+        if (!chat.getSender().equals(me) && !chat.getReceiver().equals(me)) {
+            throw new ForbiddenException("You are not part of this chat");
+        }
+
+        MultipartFile file = input.file();
+
+        String fileName =
+                UUID.randomUUID().toString()
+                        + file.getOriginalFilename();
+
+        String content = store(file, fileName);
+
         Message message = Message.builder()
                 .content(content)
                 .type(MessageType.FILE)
@@ -66,21 +88,29 @@ public class FileService {
                 .status(MessageStatus.SENT)
                 .sender(me)
                 .build();
+
         messageRepository.save(message);
+
         auditLogService.logMessage(message);
     }
 
-    private String store(MultipartFile file,
-                       String fileName) {
+    private String store(MultipartFile file, String fileName) {
+
         Path uploadedPath = Paths.get(uploadDir);
         Path target = uploadedPath.resolve(fileName);
+
         try (InputStream in = file.getInputStream()) {
-            Files.copy(in, target,
-                    StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(
+                    in,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+
         return target.toString();
     }
-
 }
