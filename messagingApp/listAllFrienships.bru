@@ -1,0 +1,20 @@
+meta {
+  name: listAllFrienships
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8080/friendships
+  body: none
+  auth: inherit
+}
+
+headers {
+  token: {{token}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

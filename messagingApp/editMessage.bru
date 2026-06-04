@@ -1,0 +1,16 @@
+meta {
+  name: editMessage
+  type: http
+  seq: 10
+}
+
+patch {
+  url: http://localhost:8080/message
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
