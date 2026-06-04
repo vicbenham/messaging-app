@@ -1,13 +1,17 @@
 meta {
-  name: AcceptFriendRequest
+  name: acceptFriendRequest
   type: http
-  seq: 5
+  seq: 7
 }
 
 patch {
-  url: http://localhost:8080/chats/1
-  body: none
+  url: http://localhost:8080/friendships/1
+  body: json
   auth: inherit
+}
+
+headers {
+  token: {{token}}
 }
 
 settings {
