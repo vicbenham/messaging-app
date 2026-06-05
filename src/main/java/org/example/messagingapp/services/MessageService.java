@@ -115,12 +115,9 @@ public class MessageService {
         Optional<Contact> optionalSender = contactRepository.findById(userId);
         Contact me = optionalSender.orElseThrow(() -> new NotFoundException("Contact not found"));
 
-        Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
-        Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
-
-        if (!chat.getIsGroup()) {
-            Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
-            Friendship friendship = optionalFriendship.orElseThrow(() -> new NotFoundException("Friendship not found"));
+        Optional<Friendship> optionalFriendship = friendshipRepository.findById(request.chatId());
+        if (optionalFriendship.isPresent()) {
+            Friendship friendship = optionalFriendship.get();
 
             if (!friendship.getUser1().getId().equals(me.getId()) && !friendship.getUser2().getId().equals(me.getId())) {
                 throw new ConflictException("User is not part of this friendship");
@@ -152,6 +149,9 @@ public class MessageService {
                             NotificationType.MESSAGE_UPDATED));
             return;
         }
+
+        Optional<Chat> optionalChat = chatRepository.findById(request.chatId());
+        Chat chat = optionalChat.orElseThrow(() -> new NotFoundException("Chat not found"));
 
         if (chat.getParticipants() == null || !chat.getParticipants().contains(me)) {
             throw new ConflictException("Contact is not part of this chat");
