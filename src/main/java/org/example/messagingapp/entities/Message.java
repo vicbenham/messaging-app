@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.example.messagingapp.enums.MessageStatus;
 import org.example.messagingapp.enums.MessageType;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class Message {
     @GeneratedValue
     private Long id;
     @Setter
+    @Length(max = 500)
     private String content;
     private LocalDateTime sentAt;
     @ManyToOne
